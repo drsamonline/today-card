@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today Card — one card for the day</title>
+<style>
+  :root{--bg:#0f1115;--card:#171a21;--ink:#e7e9ee;--mut:#9aa3b2;--line:#252a34;--acc:#22c55e}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  header,main,footer{max-width:640px;margin:0 auto;padding:20px}
+  h1{margin:0;font-size:22px}
+  .mut{color:var(--mut)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}
+  label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+  input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#0d1014;color:var(--ink);font-size:15px}
+  button{background:var(--acc);color:#06210f;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;margin-top:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .big{font-size:34px;font-weight:700;margin:0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Today</h1>
+  <p class="mut" id="dateline"></p>
+</header>
+<main>
+  <div class="card">
+    <label for="intention">One intention</label>
+    <input id="intention" placeholder="How do I want today to feel?">
+    <label for="task">One task</label>
+    <input id="task" placeholder="The one thing that would make today count.">
+    <div class="row">
+      <button id="save">Save today</button>
+      <button id="theme" class="ghost" type="button">Theme</button>
+      <button id="lang" class="ghost" type="button">Language</button>
+      <button id="export" class="ghost" type="button">Export</button>
+    </div>
+    <p class="mut" id="status" aria-live="polite"></p>
+  </div>
+  <div class="card">
+    <p class="mut" style="margin:0">Current streak</p>
+    <p class="big" id="streak">0 days</p>
+  </div>
+</main>
+<footer class="mut">Built with web-kit · offline · © 2026 Dr Sohil Momin</footer>
+
+<script src="web-kit.js"></script>
+<script>
+  Loom.theme.apply();
+  Loom.seo.title("Today Card — one card for the day");
+  Loom.seo.description("One card for the day: your date, one intention, one task, and a streak. Offline, no accounts.");
+
+  var days = Loom.storage.get("days", {});
+  var today = new Date().toISOString().slice(0, 10);
+
+  document.getElementById("dateline").textContent =
+    new Date().toLocaleDateString(Loom.i18n.lang, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  var rec = days[today] || {};
+  document.getElementById("intention").value = rec.intention || "";
+  document.getElementById("task").value = rec.task || "";
+
+  function streak() {
+    var n = 0, d = new Date();
+    for (;;) {
+      var k = d.toISOString().slice(0, 10);
+      if (days[k]) { n++; d.setDate(d.getDate() - 1); } else break;
+    }
+    return n;
+  }
+  function draw() {
+    document.getElementById("streak").textContent = streak() + (streak() === 1 ? " day" : " days");
+  }
+  draw();
+
+  document.getElementById("save").addEventListener("click", function () {
+    days[today] = {
+      intention: document.getElementById("intention").value.trim(),
+      task: document.getElementById("task").value.trim()
+    };
+    Loom.storage.set("days", days);
+    document.getElementById("status").textContent = "Saved for " + today + ".";
+    draw();
+  });
+
+  document.getElementById("theme").addEventListener("click", function () { Loom.theme.toggle(); });
+  document.getElementById("lang").addEventListener("click", function () {
+    var langs = Loom.i18n.langs();
+    Loom.i18n.setLang(langs[(langs.indexOf(Loom.i18n.lang) + 1) % langs.length]);
+  });
+  document.getElementById("export").addEventListener("click", function () {
+    var rows = Object.keys(days).sort().map(function (k) {
+      return { date: k, intention: days[k].intention || "", task: days[k].task || "" };
+    });
+    Loom.csv.download("today-card.csv", Loom.csv.toCSV(rows));
+  });
+</script>
+</body>
+</html>

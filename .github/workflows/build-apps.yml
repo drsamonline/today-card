@@ -1,0 +1,20 @@
+name: Build portable EXE + Android APK
+
+# Calls the shared, reusable build workflow in the public app-builder kit.
+# (A public repo can only call public reusable workflows, which is why the
+# shared build lives in app-builder rather than the private forge repo.)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: drsamonline/app-builder/.github/workflows/build.yml@main
+    with:
+      app_name: today-card
+      app_src: docs

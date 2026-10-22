@@ -1,2 +1,35 @@
-# today-card
-Today Card - one card for the day: your date, one intention, one task, and a streak. Offline, no accounts. Built with web-kit and Forge.
+# Today Card
+
+**One card for the day.** Your date, one intention, one task, and a streak.
+Offline, no accounts, no telemetry.
+
+Built with **web-kit** and **Forge**.
+
+## What it does
+
+- Shows today's date.
+- Lets you write **one intention** and **one task** for the day.
+- Keeps a **streak** of consecutive days you filled it in.
+- Remembers everything on your device; **Export** writes a CSV of every day.
+
+## Run it
+
+Open `docs/index.html` in a browser. That's the whole app — it works from
+`file://`, offline.
+
+## Build the EXE and APK
+
+On every push, GitHub Actions builds a portable Windows EXE and a signed Android
+APK (via the shared `app-builder` kit) and attaches them to the `app-latest`
+release. See `.github/workflows/build-apps.yml`.
+
+## Structure
+
+```
+docs/index.html      the app
+docs/web-kit.js      the shared runtime (from drsamonline/web-kit)
+```
+
+## Licence
+
+MIT. (c) 2026 Dr Sohil Momin.
