@@ -1,7 +1,7 @@
 # Today Card
 
 [![live](https://img.shields.io/badge/live-online-22c55e)](https://drsamonline.github.io/today-card/)
-[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![license](https://img.shields.io/badge/license-PolyForm Noncommercial-blue)](LICENSE)
 [![download](https://img.shields.io/github/v/release/drsamonline/today-card
 
 
