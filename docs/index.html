@@ -187,5 +187,36 @@ window.__smokeTest = function () {
 };
 window.addEventListener("error", function () { window.__bootError = true; });
 </script>
+
+<script>
+/* THE SPEC'S DONE-MEANS, AS A TEST - the four things, the empty day, and the streak.
+   Open with ?test to see it. */
+window.__todayCardTest = function () {
+  var out = [], ok = function (n, c) { out.push((c ? "PASS " : "FAIL ") + n); };
+  var g = function (id) { return document.getElementById(id); };
+  ok("the dateline renders and is not empty", !!g("dateline") && g("dateline").textContent.trim().length > 0);
+  ok("there is one intention field", !!g("intention"));
+  ok("there is one task field", !!g("task"));
+  ok("there is a streak", !!g("streak"));
+  ok("the card shows exactly four things (dateline, intention, task, streak)",
+     ["dateline","intention","task","streak"].every(function (id) { return !!g(id); })
+     && document.querySelectorAll("#card .row").length <= 6);
+  var days = {};
+  try { days = JSON.parse(localStorage.getItem("days") || "{}"); } catch (e) {}
+  var t = new Date().toISOString().slice(0, 10);
+  var has = !!days[t];
+  ok("today has a record: " + has, has === (g("intention").value.trim().length > 0 || g("task").value.trim().length > 0));
+  var n = 0, d = new Date();
+  for (;;) { var k = d.toISOString().slice(0, 10); if (days[k]) { n++; d.setDate(d.getDate() - 1); } else break; }
+  ok("the streak shown equals the consecutive count (" + n + ")", (g("streak").textContent || "").indexOf(String(n)) === 0);
+  console.log(out.join("\n"));
+  if (location.search.indexOf("test") >= 0) {
+    var p = document.createElement("pre"); p.textContent = out.join("\n");
+    p.style.cssText = "position:fixed;left:0;right:0;bottom:0;background:#111;color:#eee;padding:12px;font:12px ui-monospace,monospace;z-index:99999;max-height:40vh;overflow:auto;white-space:pre-wrap";
+    document.body.appendChild(p);
+  }
+  return out;
+};
+</script>
 </body>
 </html>
