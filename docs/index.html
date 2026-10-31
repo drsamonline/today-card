@@ -6,67 +6,131 @@
 <title>Today Card — one card for the day</title>
 <meta name="description" content="One card for the day: your date, one intention, one task, and a streak. Offline, no accounts, no telemetry.">
 <style>
-  :root{ --bg:#0f1115; --card:#171a21; --ink:#e7e9ee; --mut:#9aa3b2; --line:#252a34;
-         --acc:#22c55e; --violet:#a78bfa; }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f7f8fa; --card:#ffffff; --ink:#141821; --mut:#5b6472; --line:#e2e6ee;
-           --acc:#15803d; --violet:#6d28d9; }
+  /* Paper, not a dashboard. The app is a single card you write on, so the page
+     is a sheet of paper with a card resting on it - warm stock, serif heading,
+     one green ink. Nothing here is shared with the other apps. */
+  :root{
+    --paper:#fbf7ee; --sheet:#fffdf7; --ink:#1e1b15; --soft:#6f6656;
+    --rule:#e7ddc7; --ink-green:#177245; --ink-green-dark:#0f5634;
+    --shadow:0 1px 2px rgba(60,50,30,.06), 0 8px 24px -12px rgba(60,50,30,.35);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#14120e; --sheet:#1c1913; --ink:#efe9dc; --soft:#a89e8a;
+      --rule:#302a20; --ink-green:#4ade80; --ink-green-dark:#22c55e;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 30px -14px rgba(0,0,0,.8);
+    }
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  a{color:inherit}
-  .wrap{max-width:660px;margin:0 auto;padding:38px 20px 64px}
-  .back{font-size:13px;color:var(--mut);text-decoration:none}
-  .back:hover{color:var(--acc)}
-  h1{font-size:clamp(1.6rem,3.4vw,2.15rem);margin:14px 0 8px;letter-spacing:-.02em}
-  .lede{color:var(--mut);margin:0 0 20px;font-size:1.03rem}
-  .cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-  .go{display:inline-block;background:var(--acc);color:#06210f;font-weight:700;
-      padding:12px 18px;border-radius:11px;text-decoration:none;font-size:.98rem}
-  .go:hover{filter:brightness(1.08)}
-  .shot{display:block;width:100%;height:auto;border:1px solid var(--line);
-        border-radius:14px;margin:26px 0 0;background:var(--card)}
-  ul.why{margin:24px 0 0;padding-left:20px;color:var(--mut)}
-  ul.why li{margin:6px 0}
-  ul.why b{color:var(--ink);font-weight:600}
-  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
-         color:var(--mut);font-size:12.5px}
-  footer a{color:var(--violet);text-decoration:none}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:17px/1.65 ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+    /* a faint ruled-paper texture, drawn not downloaded */
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0 31px, color-mix(in srgb, var(--rule) 45%, transparent) 31px 32px);
+    background-attachment: fixed;
+  }
+  .sheet{
+    max-width:640px; margin:0 auto; padding:44px 24px 72px;
+    background:var(--paper);
+  }
+  .crumb{font:13px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing:.06em;
+         text-transform:uppercase; color:var(--soft); text-decoration:none}
+  .crumb:hover{color:var(--ink-green)}
+  h1{font-size:clamp(2.1rem,6vw,3.1rem); line-height:1.05; letter-spacing:-.02em;
+     margin:18px 0 10px; font-weight:600}
+  h1 em{font-style:italic; color:var(--ink-green)}
+  .lede{font-size:1.1rem; color:var(--soft); margin:0 0 26px; max-width:46ch}
+  .cta{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:6px}
+  .go{
+    font:600 16px/1 ui-sans-serif, system-ui, sans-serif;
+    background:var(--ink-green); color:#fff; text-decoration:none;
+    padding:15px 22px; border-radius:4px;
+    box-shadow:var(--shadow); border-bottom:3px solid var(--ink-green-dark);
+  }
+  .go:hover{background:var(--ink-green-dark)}
+  .alt{font:14px/1 ui-sans-serif, system-ui, sans-serif; color:var(--soft);
+       text-decoration:none; border-bottom:1px solid var(--rule); padding-bottom:2px}
+  .alt:hover{color:var(--ink); border-color:var(--ink)}
+
+  /* the card stack */
+  .stack{position:relative; margin:34px 0 8px; padding-top:10px}
+  .stack::before,.stack::after{
+    content:""; position:absolute; left:14px; right:14px; height:20px;
+    background:var(--sheet); border:1px solid var(--rule); border-radius:6px;
+    box-shadow:var(--shadow);
+  }
+  .stack::before{top:0; transform:rotate(-.7deg)}
+  .stack::after{top:5px; transform:rotate(.5deg)}
+  .stack img{
+    position:relative; display:block; width:100%; height:auto;
+    border:1px solid var(--rule); border-radius:6px; background:var(--sheet);
+    box-shadow:var(--shadow);
+  }
+  .caption{font:12.5px/1.5 ui-sans-serif, system-ui, sans-serif; color:var(--soft);
+           margin:12px 0 0; text-align:center}
+
+  h2{font:600 12px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing:.14em;
+     text-transform:uppercase; color:var(--soft); margin:40px 0 12px;
+     padding-bottom:8px; border-bottom:1px solid var(--rule)}
+  ul{list-style:none; padding:0; margin:0}
+  li{padding:11px 0 11px 30px; position:relative; border-bottom:1px solid var(--rule)}
+  li:last-child{border-bottom:none}
+  li::before{content:"✓"; position:absolute; left:0; top:11px;
+             color:var(--ink-green); font:700 15px/1.6 ui-sans-serif, system-ui, sans-serif}
+  li b{font-weight:600}
+
+  .dl{display:flex; gap:8px; flex-wrap:wrap; margin:0}
+  .dl a{
+    font:600 13.5px/1 ui-sans-serif, system-ui, sans-serif; text-decoration:none;
+    color:var(--ink); background:var(--sheet); border:1px solid var(--rule);
+    border-radius:4px; padding:11px 14px; box-shadow:var(--shadow);
+  }
+  .dl a:hover{border-color:var(--ink-green); color:var(--ink-green)}
+  .dl small{display:block; font-weight:400; color:var(--soft); margin-top:3px; font-size:11.5px}
+
+  footer{margin-top:40px; padding-top:14px; border-top:1px solid var(--rule);
+         font:12.5px/1.6 ui-sans-serif, system-ui, sans-serif; color:var(--soft)}
+  footer a{color:var(--ink-green); text-decoration:none}
+  footer a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <a class="back" href="https://drsamonline.github.io/">← all projects</a>
+<div class="sheet">
+  <a class="crumb" href="https://drsamonline.github.io/">← all projects</a>
 
-  <h1>Today Card</h1>
-  <p class="lede">One card for the day: your date, one intention, one task, and a streak.
-     It keeps working when the connection drops.</p>
+  <h1>Today <em>Card</em></h1>
+  <p class="lede">One card for the day. Your date, one intention, one task — and a streak
+     that counts the days you showed up.</p>
 
   <div class="cta">
-    <a class="go" href="app.html">Open the app →</a>
+    <a class="go" href="app.html">Open today’s card →</a>
+    <a class="alt" href="#download">or install it</a>
   </div>
 
-<!-- download:start -->
-<section style="margin:18px 0 0;padding:16px 18px;border:1px solid rgba(128,128,128,.35);border-radius:14px;font:16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
-  <p style="margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.65;font-weight:700">Download</p>
-  <p style="display:flex;gap:8px;flex-wrap:wrap;margin:0"><a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card.apk" style="display:inline-block;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;background:#22c55e;color:#06210f;">Android APK · 694 KB</a><a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card-portable.exe" style="display:inline-block;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;background:#22c55e;color:#06210f;">Windows EXE · 8.4 MB</a><a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card-linux" style="display:inline-block;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;border:1px solid rgba(128,128,128,.45);color:inherit;">Linux · 20.8 MB</a></p>
-  <p style="margin:10px 0 0;font-size:12.5px;opacity:.65">From the latest release · free · no account, no telemetry.</p>
-</section>
-<!-- download:end -->
+  <div class="stack">
+    <img src="shot.png" alt="Today Card: the date, an intention, one task, and the current streak" width="1200" height="900">
+  </div>
+  <p class="caption">No feed, no inbox, no backlog. One card, and then you close it.</p>
 
-  <img class="shot" src="shot.png" alt="Today Card, showing today's date, one intention, one task and a streak" width="600" height="375" loading="lazy">
-
-  <ul class="why">
-    <li><b>One card, not a list.</b> The constraint is the feature — one intention, one task.</li>
-    <li><b>Nothing leaves the device.</b> No account, no server, no telemetry. The streak lives in your browser.</li>
-    <li><b>Works offline.</b> Once loaded it needs no network at all, on desktop or Android.</li>
+  <h2>Why it is only one card</h2>
+  <ul>
+    <li><b>The constraint is the feature.</b> A list invites negotiation; one task does not.</li>
+    <li><b>Nothing leaves the device.</b> No account, no server, no telemetry. Your streak lives in your browser and nowhere else.</li>
+    <li><b>Works with the network off.</b> Once it has loaded it needs nothing.</li>
   </ul>
+
+  <h2 id="download">Install</h2>
+  <p class="dl">
+    <a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card.apk">Android<small>APK · 645 KB</small></a>
+    <a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card-portable.exe">Windows<small>EXE · 8.4 MB</small></a>
+    <a href="https://github.com/drsamonline/today-card/releases/download/app-latest/today-card-linux">Linux<small>binary · 20.8 MB</small></a>
+  </p>
 
   <footer>
     <a href="https://github.com/drsamonline/today-card">Source</a> ·
     <a href="https://github.com/drsamonline/today-card/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a> ·
-    built by Dr. Sohil Momin
+    by Dr. Sohil Momin
   </footer>
 </div>
 </body>
