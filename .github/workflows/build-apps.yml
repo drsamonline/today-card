@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   app:
-    uses: drsamonline/app-builder/.github/workflows/build.yml@e40fa69e7087af75588439125dd536789967d07b   # was @main
+    uses: drsamonline/app-builder/.github/workflows/build.yml@d7c4e0cbaf819c422a23e906fdf5c8b61a24de36   # was @main
     with:
       app_name: today-card
       app_src: docs
