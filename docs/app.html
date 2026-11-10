@@ -43,6 +43,19 @@
     <p class="mut" style="margin:0">Current streak</p>
     <p class="big" id="streak">0 days</p>
   </div>
+
+  <div class="card" id="past-card" hidden>
+    <p class="mut" style="margin:0 0 6px" id="past-date"></p>
+    <p id="past-intention" style="margin:0 0 8px"></p>
+    <p id="past-task" style="margin:0"></p>
+    <button class="ghost" id="past-back" type="button">Back to today</button>
+  </div>
+
+  <div class="card">
+    <p class="mut" style="margin:0 0 8px">Earlier cards</p>
+    <ul id="history" style="list-style:none;margin:0;padding:0"></ul>
+    <p class="mut" id="history-empty" style="margin:8px 0 0">Nothing saved yet. Today's card is the first.</p>
+  </div>
 </main>
 <footer class="mut">Built with web-kit · offline · © 2026 Dr Sohil Momin</footer>
 
@@ -53,7 +66,25 @@
   Loom.seo.description("One card for the day: your date, one intention, one task, and a streak. Offline, no accounts.");
 
   var days = Loom.storage.get("days", {});
-  var today = new Date().toISOString().slice(0, 10);
+
+  /* The key is the LOCAL date, not the UTC one.
+     toISOString() is UTC, so in India (UTC+5:30) a card written at 02:00 was
+     filed under yesterday while the page said today - the note was saved, and
+     then not there when you looked for it. */
+  function key(d) {
+    var y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), day = String(d.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+  var today = key(new Date());
+
+  /* Anything saved under the old UTC key for the same day is adopted, so a card
+     written before this fix is not orphaned. */
+  var utcKey = new Date().toISOString().slice(0, 10);
+  if (utcKey !== today && days[utcKey] && !days[today]) {
+    days[today] = days[utcKey];
+    delete days[utcKey];
+    Loom.storage.set("days", days);
+  }
 
   document.getElementById("dateline").textContent =
     new Date().toLocaleDateString(Loom.i18n.lang, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -75,6 +106,46 @@
   }
   draw();
 
+  /* Everything you have written, newest first. Without this the app showed only
+     today: write a card on Monday, open it on Tuesday, and the words were in
+     storage and unreachable. */
+  function fmt(k) {
+    var d = new Date(k + "T00:00:00");
+    return isNaN(d) ? k : d.toLocaleDateString(Loom.i18n.lang, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  }
+  function openPast(k) {
+    var rec = days[k] || {};
+    document.getElementById("past-date").textContent = fmt(k) + (k === today ? " · today" : "");
+    document.getElementById("past-intention").textContent = rec.intention || "—";
+    document.getElementById("past-task").textContent = rec.task || "—";
+    document.getElementById("past-card").hidden = false;
+    document.getElementById("past-card").scrollIntoView({ block: "nearest" });
+  }
+  function drawHistory() {
+    var list = document.getElementById("history");
+    var keys = Object.keys(days).sort().reverse();
+    list.textContent = "";
+    document.getElementById("history-empty").hidden = keys.length > 0;
+    keys.forEach(function (k) {
+      var rec = days[k] || {};
+      var li = document.createElement("li");
+      li.style.borderTop = "1px solid var(--line)";
+      li.style.padding = "8px 0";
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ghost";
+      b.style.cssText = "margin:0;width:100%;text-align:left;padding:8px 10px";
+      b.textContent = fmt(k) + " — " + (rec.intention || rec.task || "(empty card)");
+      b.addEventListener("click", function () { openPast(k); });
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+  }
+  document.getElementById("past-back").addEventListener("click", function () {
+    document.getElementById("past-card").hidden = true;
+  });
+  drawHistory();
+
   document.getElementById("save").addEventListener("click", function () {
     days[today] = {
       intention: document.getElementById("intention").value.trim(),
@@ -83,6 +154,7 @@
     Loom.storage.set("days", days);
     document.getElementById("status").textContent = "Saved for " + today + ".";
     draw();
+    drawHistory();
   });
 
   document.getElementById("theme").addEventListener("click", function () { Loom.theme.toggle(); });

@@ -11,7 +11,8 @@
 [![download](https://img.shields.io/github/v/release/drsamonline/today-card
 
 
-**One card for the day.** Your date, one intention, one task, and a streak.
+**One card for the day.** Your date, one intention, one task, and a streak — and every card you
+have written, listed underneath so you can open it again. Write on Monday, read it on Tuesday.
 Offline, no accounts, no telemetry.
 
 Built with **web-kit** and **Forge**.

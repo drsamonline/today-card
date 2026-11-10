@@ -3,10 +3,10 @@
   "locked": false,
   "files": {
     "README.md": {
-      "sha": "823a92a6e575784956a80170dde32673319458d2",
+      "sha": "442e741ff5c5a6972c671258bf114728ae50ac29",
       "producer": "audit-2026-11-10",
       "class": "agent",
-      "at": "2026-11-10T13:44:38Z"
+      "at": "2026-11-10T16:18:57Z"
     },
     "docs/index.html": {
       "sha": "9f20b9d624899ba4fed8af94dce9c2b2fa43b555",
@@ -19,7 +19,25 @@
       "producer": "audit-2026-11-10",
       "class": "canonical",
       "at": "2026-11-10T15:13:14Z"
+    },
+    "docs/app.html": {
+      "sha": "03781ef527e0cb0f7d3fd3bb598946a928f2ba51",
+      "producer": "audit-2026-11-10",
+      "class": "agent",
+      "at": "2026-11-10T16:18:57Z"
+    },
+    "VERSION": {
+      "sha": "9084fa2f716a7117829f3f32a5f4cef400e02903",
+      "producer": "audit-2026-11-10",
+      "class": "agent",
+      "at": "2026-11-10T16:18:58Z"
+    },
+    "CHANGELOG.md": {
+      "sha": "668733ccb734ed9794e2df4d713cdbe52a7b0ce2",
+      "producer": "audit-2026-11-10",
+      "class": "agent",
+      "at": "2026-11-10T16:18:58Z"
     }
   },
-  "updated": "2026-11-10T15:13:14Z"
+  "updated": "2026-11-10T16:18:58Z"
 }
