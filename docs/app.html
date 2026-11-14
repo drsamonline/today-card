@@ -36,6 +36,9 @@
       <button id="theme" class="ghost" type="button">Theme</button>
       <button id="lang" class="ghost" type="button">Language</button>
       <button id="export" class="ghost" type="button">Export</button>
+      <button id="copy" class="ghost" type="button">Copy</button>
+      <button id="share" class="ghost" type="button" hidden>Share</button>
+      <button id="remind" class="ghost" type="button">Remind</button>
     </div>
     <p class="mut" id="status" aria-live="polite"></p>
   </div>
@@ -96,7 +99,7 @@
   function streak() {
     var n = 0, d = new Date();
     for (;;) {
-      var k = d.toISOString().slice(0, 10);
+      var k = key(d);   /* local key: the cards are filed locally, so UTC broke the streak before 05:30 IST */
       if (days[k]) { n++; d.setDate(d.getDate() - 1); } else break;
     }
     return n;
@@ -121,6 +124,64 @@
     document.getElementById("past-card").hidden = false;
     document.getElementById("past-card").scrollIntoView({ block: "nearest" });
   }
+  /* ---------- delivery --------------------------------------------------
+     A card that never leaves the tab is a diary nobody reads. Copy it into a
+     message, share it, or drop a daily reminder into the calendar you already
+     look at. All offline: no account, no server, nothing running in the
+     background, and no notification permission to ask for. */
+  function note(m) { document.getElementById("status").textContent = m; }
+  function cardText() {
+    var r = days[today] || {};
+    var lines = [new Date().toLocaleDateString(Loom.i18n.lang,
+      { weekday: "long", day: "numeric", month: "long", year: "numeric" })];
+    if (r.intention) lines.push("Intention: " + r.intention);
+    if (r.task) lines.push("Task: " + r.task);
+    if (!r.intention && !r.task) lines.push("(no card saved yet)");
+    return lines.join("\n");
+  }
+  function download(name, text, type) {
+    var url = URL.createObjectURL(new Blob([text], { type: type }));
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function copyText(text, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+      return;
+    }
+    fallback();
+    function fallback() {
+      var t = document.createElement("textarea");
+      t.value = text; t.style.position = "absolute"; t.style.left = "-9999px";
+      document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch (e) {}
+      t.remove();
+    }
+  }
+  document.getElementById("copy").addEventListener("click", function () {
+    copyText(cardText(), function () { note("Copied. Paste it where the day happens."); });
+  });
+  var shareBtn = document.getElementById("share");
+  if (navigator.share) {
+    shareBtn.hidden = false;
+    shareBtn.addEventListener("click", function () {
+      navigator.share({ title: "Today's card", text: cardText() }).catch(function () {});
+    });
+  }
+  document.getElementById("remind").addEventListener("click", function () {
+    var d = new Date(); d.setDate(d.getDate() + 1);
+    var day = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+    var stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//drsamonline//Today Card//EN", "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT", "UID:today-card-reminder@drsamonline.github.io", "DTSTAMP:" + stamp,
+      "DTSTART;VALUE=DATE:" + day, "RRULE:FREQ=DAILY", "SUMMARY:Fill today's card",
+      "DESCRIPTION:One intention\\, one task.", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    download("today-card-reminder.ics", ics, "text/calendar");
+    note("Reminder downloaded. Open it once to add the daily event.");
+  });
+
   function drawHistory() {
     var list = document.getElementById("history");
     var keys = Object.keys(days).sort().reverse();
@@ -135,7 +196,8 @@
       b.type = "button";
       b.className = "ghost";
       b.style.cssText = "margin:0;width:100%;text-align:left;padding:8px 10px";
-      b.textContent = fmt(k) + " — " + (rec.intention || rec.task || "(empty card)");
+      var bits = [rec.intention, rec.task].filter(Boolean);
+      b.textContent = fmt(k) + " — " + (bits.length ? bits.join(" · ") : "(empty card)");
       b.addEventListener("click", function () { openPast(k); });
       li.appendChild(b);
       list.appendChild(li);

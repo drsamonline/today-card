@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.2.0 — 2026-11-14
+
+### Added — a way for the card to leave the tab
+
+Copy, Share (where the browser has it) and Remind. Remind downloads an .ics with
+a daily all-day event, so the reminder lives in the calendar you already look at:
+no account, no server, no notification permission, nothing running in the
+background. Export already existed; it produced a JSON backup, which is not
+delivery.
+
+### Fixed — the streak counted in UTC while the cards were filed locally
+
+`streak()` walked days with `toISOString()`, so before 05:30 IST the loop looked
+for yesterday's key, found nothing and reported 0. The card key was fixed for
+this in 1.1.0; the streak loop was missed. It now uses the same local `key()`.
+
+### Fixed — the history line dropped the task
+
+Earlier cards showed the intention only, so a day saved with a task and no
+intention read "(empty card)". Both are listed now.
+
+
 ## 1.1.0 — 2026-11-10
 
 ### Fixed — a saved card could not be opened again
