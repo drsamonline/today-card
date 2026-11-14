@@ -9,10 +9,10 @@
       "at": "2026-11-10T16:18:57Z"
     },
     "docs/index.html": {
-      "sha": "9f20b9d624899ba4fed8af94dce9c2b2fa43b555",
-      "producer": "bootstrap@2026-11-04",
-      "class": "generated",
-      "at": "2026-11-04T20:09:08Z"
+      "sha": "556f2b85b3a970f41fb5accd67725ee0da48554f",
+      "producer": "human",
+      "class": "hand",
+      "at": "2026-11-14T18:06:49Z"
     },
     ".github/workflows/build-apps.yml": {
       "sha": "44753e4cb981bb2e6bacd1ab552e24e41e18b2ac",
@@ -39,5 +39,5 @@
       "at": "2026-11-10T16:18:58Z"
     }
   },
-  "updated": "2026-11-10T16:18:58Z"
+  "updated": "2026-11-14T18:06:49Z"
 }
